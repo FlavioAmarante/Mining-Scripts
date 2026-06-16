@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<batch>
+    <info>
+        <application>Isatis.neo-mining</application>
+        <date>March-2024</date>
+        <summary><![CDATA[Authors (original version) - Gabriel Moreira & Gustavo Scholze]]></summary>
+    </info>
+    <comment>Prepara Pastas Inicio Projeto</comment>
+    <python><![CDATA[from pathlib import Path
+
+# defining the project path from the app dictionary
+project_public_path=Path(app['project_public_path'])
+
+# creating a list of directories that must be created in the project "Public" folder
+dirs=[ 
+('dataset', '01_Dataset/'),
+('gdms', '01_Dataset/00_Gdms/'),
+('fso', '01_Dataset/01_Fso/'),
+('LP', '01_Dataset/01_Fso/LP/'),
+('CP', '01_Dataset/01_Fso/CP/'),
+('fac', '01_Dataset/02_Fac/'),
+('cac', '01_Dataset/03_Cac/'),
+('dens', '01_Dataset/04_Den/'),
+('logs', '01_Dataset/04_Den/00_Logs/'),
+('las', '01_Dataset/04_Den/01_Las/'),
+('conv', '01_Dataset/04_Den/02_Conv/'),
+('qaqc', '01_Dataset/05_QAQC/'),
+('mapa', '01_Dataset/06_Mapa/'),
+('wireframes', '02_Wireframes/'),
+('topo', '02_Wireframes/01_Topo/'),
+('geo', '02_Wireframes/02_Geo/'),
+('waux', '02_Wireframes/03_Aux/'),
+('lva', '02_Wireframes/03_Aux/01_LVA'),
+('set', '02_Wireframes/03_Aux/02_Setorr'),
+('wsec', '02_Wireframes/04_Sector/'),
+('dms', '02_Wireframes/05_Dms/'),
+('pilhas', '02_Wireframes/06_Pilhas/'),
+('bm', '03_Block_model'),
+('festima', '04_Estimation'),
+('fgrade', '04_Estimation/01_Grade/'),
+('vario', '04_Estimation/01_Grade/01_Vario/'),
+('fdens', '04_Estimation/02_Density/'),
+('fclass', '04_Estimation/03_Class/'),
+('temp', '00_Temp'),
+('scripts', '06_Scripts'),
+('report', '05_Report'),
+('rrm', '05_Report/01_Grid_report/'),
+('trs', '05_Report/02_TRS/'),
+('rpr', '05_Report/03_Peer_Review/'),
+('rgr', '05_Report/05_Consent_letter/'),
+('raud', '05_Report/04_Audit/'),
+('geomet', '06_Geomet'),
+('f_bkp', '07_Backup'),
+]
+
+# creating the directories from the list
+for dir_name, rel_path in dirs:
+  dir_path=project_public_path / rel_path
+  dir_path.mkdir(parents = True, exist_ok = True)
+  locals()[dir_name]=dir_path]]></python>
+    <task id="directory-create">
+        <param key="PARENT_DIRECTORY">
+            <path/>
+        </param>
+        <param key="NAME">01_Dataset</param>
+    </task>
+    <task id="directory-create">
+        <param key="PARENT_DIRECTORY">
+            <path/>
+        </param>
+        <param key="NAME">02_Wireframes</param>
+    </task>
+    <task id="directory-create">
+        <param key="PARENT_DIRECTORY">
+            <path/>
+        </param>
+        <param key="NAME">03_Block_Model</param>
+    </task>
+    <task id="directory-create">
+        <param key="PARENT_DIRECTORY">
+            <path>02_Wireframes</path>
+        </param>
+        <param key="NAME">01_Topo</param>
+    </task>
+    <task id="directory-create">
+        <param key="PARENT_DIRECTORY">
+            <path>02_Wireframes</path>
+        </param>
+        <param key="NAME">02_Geo</param>
+    </task>
+    <task id="directory-create">
+        <param key="PARENT_DIRECTORY">
+            <path>02_Wireframes</path>
+        </param>
+        <param key="NAME">03_Aux</param>
+    </task>
+    <task id="directory-create">
+        <param key="PARENT_DIRECTORY">
+            <path>02_Wireframes</path>
+        </param>
+        <param key="NAME">04_Setor</param>
+    </task>
+    <task id="directory-create">
+        <param key="PARENT_DIRECTORY">
+            <path>01_Dataset</path>
+        </param>
+        <param key="NAME">01_Fso</param>
+    </task>
+    <task id="directory-create">
+        <param key="PARENT_DIRECTORY">
+            <path>01_Dataset</path>
+        </param>
+        <param key="NAME">02_Fac</param>
+    </task>
+    <task id="directory-create">
+        <param key="PARENT_DIRECTORY">
+            <path>01_Dataset</path>
+        </param>
+        <param key="NAME">03_Cac</param>
+    </task>
+    <task id="directory-create">
+        <param key="PARENT_DIRECTORY">
+            <path>01_Dataset</path>
+        </param>
+        <param key="NAME">04_Den</param>
+    </task>
+</batch>
