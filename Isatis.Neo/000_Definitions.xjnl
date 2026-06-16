@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<batch>
+    <info>
+        <application>Isatis.neo-mining</application>
+        <date>2024-08-30T14:15:02</date>
+        <summary/>
+    </info>
+    <comment>---- Definições iniciais ----</comment>
+    <python><![CDATA[import pandas as pd
+from pathlib import Path
+
+# Import Pastas
+public_path = Path(app['project_public_path'])
+
+info = pd.read_excel(
+    public_path / "par.xlsx", sheet_name = 'info')
+    
+ddb_tables = pd.read_excel(
+    public_path / "par.xlsx", sheet_name = 'ddb_tables')
+
+par_bm = pd.read_excel(
+    public_path / "par.xlsx", sheet_name = 'blockmodel')
+
+par_estima = pd.read_excel(
+    public_path / "par.xlsx", sheet_name = 'ok_teor')
+
+par_nn_out = pd.read_excel(
+    public_path / "par.xlsx", sheet_name = 'nn_outliers')
+    
+vario_teor = pd.read_excel(
+    public_path / "par.xlsx", sheet_name = 'vario_teor')
+    
+umidade = pd.read_excel(
+    public_path / "par.xlsx", sheet_name = 'umidade')
+
+par_estima_den = pd.read_excel(
+    public_path / "par.xlsx", sheet_name = 'ok_density')
+
+vario_den = pd.read_excel(
+    public_path / "par.xlsx", sheet_name = 'vario_den')
+
+lito_med = pd.read_excel(
+    public_path / "par.xlsx", sheet_name = 'lito_med')
+    
+par_estima_ik = pd.read_excel(
+    public_path / "par.xlsx", sheet_name = 'ir_search')    
+
+vario_ik = pd.read_excel(
+    public_path / "par.xlsx", sheet_name = 'vario_ik') 
+
+par_un = pd.read_excel(
+    public_path / "par.xlsx", sheet_name = 'ore_control') 
+
+qaqc_nc = pd.read_excel(
+    public_path / "par.xlsx", sheet_name = 'qaqc') 
+
+par_est = pd.read_excel(
+    public_path / "par.xlsx", sheet_name = 'estereis')
+    
+par_las_val = pd.read_excel(
+    public_path / "par.xlsx", sheet_name = 'las_val')
+
+dila_ero = pd.read_excel(
+    public_path / "par.xlsx", sheet_name = 'dila_ero')  
+
+pp = pd.read_excel(
+    public_path / "par.xlsx", sheet_name = 'pos_proc')    
+      
+
+#### Definine domínios ####   
+domain_hem = list(par_estima[par_estima.grupo == 'hem'].domain.unique())
+domain_ita = list(par_estima[par_estima.grupo == 'ita'].domain.unique())
+domain_est = list(par_estima[par_estima.grupo == 'est'].domain.unique())
+
+domain_den_hem = list(par_estima_den[par_estima_den.grupo == 'hem'].domain.unique())
+domain_den_ita = list(par_estima_den[par_estima_den.grupo == 'ita'].domain.unique())
+domain_den_est = list(par_estima_den[par_estima_den.grupo == 'est'].domain.unique())
+
+domain_hem = [element.upper() for element in domain_hem]
+domain_ita = [element.upper() for element in domain_ita]
+domain_est = [element.upper() for element in domain_est]
+
+domains = list(lito_med.domain.unique())
+sectors = list(par_estima.setor.unique())
+sectors_dila = list(dila_ero.setor.unique())
+domain_un = list(par_un.domain.unique())
+
+sect_den = list(par_estima_den.setor.unique())
+sect_ik = list(par_estima_ik.setor.unique())
+
+est_dom = list(par_est.domain.unique())
+est_iqd = list(par_est.estima.unique())
+est_sec = list(par_est.setor.unique())
+
+#### Pastas Internas do Projeto ####
+pasta_gra_ddb ='01_Dataset/03_Cac'
+pasta_den_ddb ='01_Dataset/04_Den'
+pasta_mb ='03_Block_Model'
+
+#### Pastas Externas do Projeto ####
+folder_gra = app['project_path'] + "/public/04_Estimation/01_Grade/"
+folder_den = app['project_path'] + "/public/04_Estimation/02_Density/"
+folder_fso = app['project_path'] + "/public/01_Dataset/01_Fso"
+folder_fac = app['project_path'] + "/public/01_Dataset/02_Fac"
+folder_cac = app['project_path'] + "/public/01_Dataset/03_Cac"
+folder_dendb = app['project_path'] + "/public/01_Dataset/04_Den"
+folder_bm = app['project_path'] + "/public/03_Block_model"
+folder_rep = app['project_path'] + "/public/07_Report/01_Grid_report"
+folder_las = app['project_path'] + "/public/01_Dataset/04_Den/01_Las"
+folder_conv = app['project_path'] + "/public/01_Dataset/04_Den/02_Conv"
+folder_cls = app['project_path'] + "/public/04_Estimation/03_Class/"
+
+#### Definição Dominios ####
+lito_ore = info[info.Parameters=='ore'].Variables.iloc[0].split(',')
+lito_ore_upper = [element.upper() for element in lito_ore]
+lito_ore_lower = [element.lower() for element in lito_ore]
+lito_est = info[info.Parameters=='waste'].Variables.iloc[0].split(',')
+lito_est_upper = [element.upper() for element in lito_ore]
+lito_est_lower = [element.lower() for element in lito_ore]
+
+#### OUTLIERS ####
+lito_out = par_nn_out.domain.unique()
+lito_out = [element.upper() for element in lito_out]
+print(lito_out)
+
+#### Definição Variáveis Estimativa Teores ####
+var_estima = [ 'G1','G2','G3','G4',
+            'AFE1', 'ASI1', 'AP1', 'AAL1', 'AMN1', 'APF1', 'ATI1', 'AMG1', 'ACA1',
+            'AFE2', 'ASI2', 'AP2', 'AAL2', 'AMN2', 'APF2', 'ATI2', 'AMG2', 'ACA2',
+            'AFE3', 'ASI3', 'AP3', 'AAL3', 'AMN3', 'APF3', 'ATI3', 'AMG3', 'ACA3',
+            'AFE4', 'ASI4', 'AP4', 'AAL4', 'AMN4', 'APF4', 'ATI4', 'AMG4', 'ACA4']
+
+#### Definições QA\QC #### 
+
+remv =  { 'SA': 'Amostras sem analises quimicas.',
+          'ES': 'Amostras de litotipos estereis.',
+          'SG': 'Amostras sem granulometria.',
+          'SR': 'Amostras com recuperacoo inferior a 60%, sem recuperacao ou destruido.',
+          'QC': 'Amostras reclassificadas como nao conformidades do QA|QC.'  
+}
+
+lst_zera = ['FEGL', 'SIGL', 'PGL', 'ALGL', 'MNGL', 'PFGL', 'CAGL', 'MGGL', 'TIGL', 'FOGL', 'FE3O4_GL',
+            'G1', 'G2', 'G3', 'G23', 'G4',
+            'FE1', 'SI1', 'P1', 'AL1', 'MN1', 'PF1', 'CA1', 'MG1', 'TI1', 'FO1', 'FE3O4_1', 
+            'FE2', 'SI2', 'P2', 'AL2', 'MN2', 'PF2', 'CA2', 'MG2', 'TI2', 'FO2', 'FE3O4_2', 
+            'FE3', 'SI3', 'P3', 'AL3', 'MN3', 'PF3', 'CA3', 'MG3', 'TI3', 'FO3', 'FE3O4_3',
+            'FE23', 'SI23', 'P23', 'AL23', 'MN23', 'PF23', 'CA23', 'MG23', 'TI23', 'FO23', 'FE3O4_23',
+            'FE4', 'SI4', 'P4', 'AL4', 'MN4', 'PF4', 'CA4', 'MG4', 'TI4', 'FO4', 'FE3O4_4', 
+            'FGRA', 'FQGL', 'FQ1', 'FQ2', 'FQ3', 'FQ4', 'REC']
+
+#### Classificação ####
+
+# Define Dominios IK
+ind_ore  = info[info.Parameters=='ik_1'].Variables.iloc[0].split(',')
+ind_zero = info[info.Parameters=='ik_0'].Variables.iloc[0].split(',')
+lito_ore_ik = info[info.Parameters=='ik_1'].Variables.iloc[0].split(',')
+
+#### Listas de variáveis #### 
+lst_glb = ['FEGL', 'SIGL', 'PGL', 'ALGL', 'MNGL', 'PFGL', 'TIGL', 'MGGL', 'CAGL']
+lst_glb_c = ['FEGL_C', 'SIGL_C', 'PGL_C', 'ALGL_C', 'MNGL_C', 'PFGL_C', 'TIGL_C', 'MGGL_C', 'CAGL_C']
+lst_f1 =  ['FE1', 'SI1', 'P1', 'AL1', 'MN1','TI1','PF1', 'MG1', 'CA1']
+lst_f2 =  ['FE2', 'SI2', 'P2', 'AL2', 'MN2','TI2','PF2', 'MG2', 'CA2']
+lst_f3 =  ['FE3', 'SI3', 'P3', 'AL3', 'MN3','TI3','PF3', 'MG3', 'CA3']
+lst_f4 =  ['FE4', 'SI4', 'P4', 'AL4', 'MN4','TI4','PF4', 'MG4', 'CA4']
+lst_gs =  ['G1','G2','G3','G4']
+lst_of_lsts = [lst_glb,lst_f1,lst_f2,lst_f3,lst_f4,lst_gs]
+
+remv_lst = list(remv.keys())
+
+lst_all = ['FEGL', 'SIGL', 'PGL', 'ALGL', 'MNGL', 'PFGL', 'TIGL', 'MGGL', 'CAGL',
+            'G1','G2','G3','G4',
+            'FE1', 'SI1', 'P1', 'AL1', 'MN1','TI1','PF1', 'MG1', 'CA1',
+            'FE2', 'SI2', 'P2', 'AL2', 'MN2','TI2','PF2', 'MG2', 'CA2',
+            'FE3', 'SI3', 'P3', 'AL3', 'MN3','TI3','PF3', 'MG3', 'CA3',
+            'FE4', 'SI4', 'P4', 'AL4', 'MN4','TI4','PF4', 'MG4', 'CA4']
+
+cols_fe = ['FEGL', 'FE1', 'FE2', 'FE3', 'FE4']
+cols_si = ['SIGL', 'SI1', 'SI2', 'SI3', 'SI4']
+cols_p  = ['PGL', 'P1', 'P2', 'P3', 'P4']
+cols_al = ['ALGL', 'AL1', 'AL2', 'AL3', 'AL4']
+cols_mn = ['MNGL', 'MN1', 'MN2', 'MN3', 'MN4']
+cols_pf = ['PFGL', 'PF1', 'PF2', 'PF3', 'PF4']
+cols_ti = ['TIGL', 'TI1', 'TI2', 'TI3', 'TI4']
+cols_ca = ['CAGL', 'CA1', 'CA2', 'CA3', 'CA4']
+cols_mg = ['MGGL' ,'MG1', 'MG2', 'MG3', 'MG4']
+
+cls_all = [cols_fe,cols_si,cols_p ,cols_al ,cols_mn,cols_pf ,cols_ti,cols_ca,cols_mg]  
+
+lst_fx = ['FE1', 'FE2', 'FE3', 'FE4','SI1', 'SI2', 'SI3', 'SI4','P1', 'P2', 'P3', 'P4',
+ 'AL1', 'AL2', 'AL3', 'AL4', 'MN1', 'MN2', 'MN3', 'MN4', 'PF1', 'PF2', 'PF3', 'PF4',
+  'TI1', 'TI2', 'TI3', 'TI4', 'MG1', 'MG2', 'MG3', 'MG4','CA1', 'CA2', 'CA3', 'CA4']
+
+gra = ['G1','G2','G3','G4']
+
+lst_acc = ['AFE1', 'ASI1', 'AP1', 'AAL1', 'AMN1', 'APF1', 'ATI1', 'AMG1', 'ACA1',
+            'AFE2', 'ASI2', 'AP2', 'AAL2', 'AMN2', 'APF2', 'ATI2', 'AMG2', 'ACA2',
+            'AFE3', 'ASI3', 'AP3', 'AAL3', 'AMN3', 'APF3', 'ATI3', 'AMG3', 'ACA3',
+            'AFE4', 'ASI4', 'AP4', 'AAL4', 'AMN4', 'APF4', 'ATI4', 'AMG4', 'ACA4']
+ 
+varor = ['FE', 'AL', 'SI','MN', 'PF', 'P', 'MG', 'CA', 'TI'] 
+varn = ['GL','1','2','3','4'] 
+
+# Zera teores
+zera_tipo = ['SA','QC', 'SR','FQ','SG']
+
+#### Correção dados históricos ####
+flx_3x =  (info[info.Parameters=='flx_3x'].Variables.iloc[0].split(','))
+flx_4x =  (info[info.Parameters=='flx_4x'].Variables.iloc[0].split(','))
+flx_glb = (info[info.Parameters=='glb'].Variables.iloc[0].split(','))
+tipo = (info[info.Parameters=='var_3x'].Variables.iloc[0])
+var_tipo = (info[info.Parameters=='break'].Variables.iloc[0])
+g2_reg = (info[info.Parameters=='reg_ax'].Variables.iloc[0])
+interc = (info[info.Parameters=='reg_b'].Variables.iloc[0])
+
+# Necessário atualizar valor regressão linear para outros depósitos
+
+lst_fec = ['FQ1','FQ2','FQ3','FQ4','FQGL','FGRA']
+
+]]></python>
+</batch>
